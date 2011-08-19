@@ -35,12 +35,12 @@ class SSM_Admin_Post {
 		//wp_enqueue_script('ssm-main', SSM_URL . '/js/ssm-main.js', ('jquery') );
 		
 		// Send to editor ?
-		if ( isset($_GET['shortcode']) && isset($shortcode_tags[$_GET['shortcode']]) ) {
+		if ( isset($_GET['shortcode']) ) {
 			?>
 			<script type="text/javascript">
 			/* <![CDATA[ */
 			var win = window.dialogArguments || opener || parent || top;
-			win.send_to_editor('[<?php echo addslashes($_GET['shortcode']); ?>]');
+			win.send_to_editor('<?php echo addslashes($_GET['shortcode']); ?>');
 			/* ]]> */
 			</script>
 			<?php
@@ -104,9 +104,12 @@ class SSM_Admin_Post {
 		
 		<form method="post" action="" class="media-upload-form validate" id="library-form">
 			<div id="media-items">
-				<?php foreach ( $_shortcode_tags as $shortcode_key => $shortcode_value ) : ?>
+				<?php
+				foreach ( $_shortcode_tags as $shortcode_key => $shortcode_value ) :
+					$insertion = ( !empty($ssm_fields[$shortcode_key]['default']) ) ? $ssm_fields[$shortcode_key]['default'] : '['.$shortcode_key.']';
+					?>
 					<div class='media-item'>
-						<a type="submit" class="button insert_link" href="<?php echo add_query_arg( array('shortcode' => $shortcode_key) ); ?>"><?php _e('Insert', 'ssm'); ?></a>
+						<a type="submit" class="button insert_link" href="<?php echo add_query_arg( array('shortcode' => $insertion) ); ?>"><?php _e('Insert', 'ssm'); ?></a>
 						
 						<a class='toggle describe-toggle-on' href='#'><?php _e('Show usage', 'ssm'); ?></a>
 						<a class='toggle describe-toggle-off' href='#'><?php _e('Hide usage', 'ssm'); ?></a>

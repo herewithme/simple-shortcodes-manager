@@ -2,7 +2,7 @@
 /*
 Plugin Name: Simple Shortcodes Manager
 Plugin URI: http://www.beapi.fr
-Description: Add a lightbox button to easily insert shortcodes inside a post. Automatically crawl all actives shortcodes. Allow to add documentation for each shortcodes.
+Description: Add a lightbox button to easily insert shortcodes inside a post. Automatically list all actives shortcodes. Allow to add documentation for each shortcodes.
 Version: 1.2
 Author: BeAPI
 Author URI: http://www.beapi.fr
