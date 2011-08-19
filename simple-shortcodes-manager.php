@@ -3,9 +3,9 @@
 Plugin Name: Simple Shortcodes Manager
 Plugin URI: http://www.beapi.fr
 Description: Add a lightbox button to easily insert shortcodes inside a post. Automatically crawl all actives shortcodes. Allow to add documentation for each shortcodes.
-Version: 1.1
-Author: Benjamin Niess
-Author URI: http://www.benjamin-niess.fr
+Version: 1.2
+Author: BeAPI
+Author URI: http://www.beapi.fr
 Text Domain: ssm
 Domain Path: /languages/
 
@@ -34,7 +34,7 @@ if ( is_admin() ) {
 	require( SSM_DIR . '/inc/class.admin.post.php');
 }
 
-// Activate Recommend a friend
+// Activate Simple Shortcode Manager
 //register_activation_hook  ( __FILE__, 'SSM_Install' );
 
 // Init SSM
