@@ -137,8 +137,8 @@ class SSM_Admin {
 							<tr class='<?php echo $class; ?>' valign="top"> 
 								<td><input type="checkbox" name="ssm[<?php echo $shortcode_key; ?>][hide]" <?php checked( (($ssm_fields[$shortcode_key]['hide'] == 1) ? 1 : 0), 1 ); ?> value="1" /></td>
 								<td>[<?php echo esc_html($shortcode_key); ?>]</td>
-								<td><textarea class="widefat lmceEditor" rows="5" cols="15" name="ssm[<?php echo $shortcode_key; ?>][description]"><?php echo stripslashes( nl2br($ssm_fields[$shortcode_key]['description']) ); ?></textarea></td>
-								<td><textarea class="widefat lmceEditor" rows="5" cols="15" name="ssm[<?php echo $shortcode_key; ?>][usage]"><?php echo stripslashes( nl2br($ssm_fields[$shortcode_key]['usage']) ); ?></textarea></td>
+								<td><textarea class="widefat lmceEditor" rows="5" cols="15" name="ssm[<?php echo $shortcode_key; ?>][description]"><?php echo stripslashes( $ssm_fields[$shortcode_key]['description'] ); ?></textarea></td>
+								<td><textarea class="widefat lmceEditor" rows="5" cols="15" name="ssm[<?php echo $shortcode_key; ?>][usage]"><?php echo stripslashes( $ssm_fields[$shortcode_key]['usage'] ); ?></textarea></td>
 								<td><input class="widefat" style="width: 90%" name="ssm[<?php echo $shortcode_key; ?>][default]" value="<?php echo esc_attr( stripslashes( $ssm_fields[$shortcode_key]['default'] ) ); ?>" /></td>
 							</tr>
 						<?php endforeach; ?>
@@ -251,7 +251,7 @@ class SSM_Admin {
 	}
 
 	function initTinyMCE() {
-		global $concatenate_scripts, $compress_scripts, $tinymce_version, $editor_styles;
+		global $concatenate_scripts, $compress_scripts, $tinymce_version;
 		
 		if ( ! user_can_richedit() )
 			return;
@@ -268,85 +268,6 @@ class SSM_Admin {
 		*/
 		$mce_spellchecker_languages = apply_filters('mce_spellchecker_languages', '+English=en,Danish=da,Dutch=nl,Finnish=fi,French=fr,German=de,Italian=it,Polish=pl,Portuguese=pt,Spanish=es,Swedish=sv');
 		$plugins = array( 'safari', 'inlinepopups', 'spellchecker', 'paste', 'wordpress', 'media', 'fullscreen', 'wpeditimage', 'wpgallery', 'tabfocus' );
-		
-		/*
-		The following filter takes an associative array of external plugins for TinyMCE in the form 'plugin_name' => 'url'.
-		It adds the plugin's name to TinyMCE's plugins init and the call to PluginManager to load the plugin.
-		The url should be absolute and should include the js file name to be loaded. Example:
-		array( 'myplugin' => 'http://my-site.com/wp-content/plugins/myfolder/mce_plugin.js' )
-		If the plugin uses a button, it should be added with one of the "$mce_buttons" filters.
-		*/
-		$mce_external_plugins = apply_filters('mce_external_plugins', array());
-		
-		$ext_plugins = '';
-		if ( ! empty($mce_external_plugins) ) {
-			
-			/*
-			The following filter loads external language files for TinyMCE plugins.
-			It takes an associative array 'plugin_name' => 'path', where path is the
-			include path to the file. The language file should follow the same format as
-			/tinymce/langs/wp-langs.php and should define a variable $strings that
-			holds all translated strings.
-			When this filter is not used, the function will try to load {mce_locale}.js.
-			If that is not found, en.js will be tried next.
-			*/
-			$mce_external_languages = apply_filters('mce_external_languages', array());
-			
-			$loaded_langs = array();
-			$strings = '';
-			
-			if ( ! empty($mce_external_languages) ) {
-				foreach ( $mce_external_languages as $name => $path ) {
-					if ( @is_file($path) && @is_readable($path) ) {
-						include_once($path);
-						$ext_plugins .= $strings . "\n";
-						$loaded_langs[] = $name;
-					}
-				}
-			}
-			
-			foreach ( $mce_external_plugins as $name => $url ) {
-				
-				if ( is_ssl() ) $url = str_replace('http://', 'https://', $url);
-				
-				$plugins[] = '-' . $name;
-				
-				$plugurl = dirname($url);
-				$strings = $str1 = $str2 = '';
-				if ( ! in_array($name, $loaded_langs) ) {
-					$path = str_replace( WP_PLUGIN_URL, '', $plugurl );
-					$path = WP_PLUGIN_DIR . $path . '/langs/';
-					
-					if ( function_exists('realpath') )
-						$path = trailingslashit( realpath($path) );
-					
-					if ( @is_file($path . $mce_locale . '.js') )
-						$strings .= @file_get_contents($path . $mce_locale . '.js') . "\n";
-					
-					if ( @is_file($path . $mce_locale . '_dlg.js') )
-						$strings .= @file_get_contents($path . $mce_locale . '_dlg.js') . "\n";
-					
-					if ( 'en' != $mce_locale && empty($strings) ) {
-						if ( @is_file($path . 'en.js') ) {
-							$str1 = @file_get_contents($path . 'en.js');
-							$strings .= preg_replace( '/([\'"])en\./', '$1' . $mce_locale . '.', $str1, 1 ) . "\n";
-						}
-						
-						if ( @is_file($path . 'en_dlg.js') ) {
-							$str2 = @file_get_contents($path . 'en_dlg.js');
-							$strings .= preg_replace( '/([\'"])en\./', '$1' . $mce_locale . '.', $str2, 1 ) . "\n";
-						}
-					}
-					
-					if ( ! empty($strings) )
-						$ext_plugins .= "\n" . $strings . "\n";
-				}
-				
-				$ext_plugins .= 'tinyMCEPreInit.load_ext("' . $plugurl . '", "' . $mce_locale . '");' . "\n";
-				$ext_plugins .= 'tinymce.PluginManager.load("' . $name . '", "' . $url . '");' . "\n";
-			}
-		}
-		
 		$plugins = implode($plugins, ',');
 		
 		$mce_buttons = apply_filters('_mce_buttons', array('bold', 'italic', 'strikethrough', '|', 'bullist', 'numlist', 'blockquote', '|', 'link', 'unlink', 'code' ));
@@ -400,39 +321,6 @@ class SSM_Admin {
 			'wpeditimage_disable_captions' => $no_captions,
 			'plugins' => $plugins
 		);
-		
-		if ( ! empty( $editor_styles ) && is_array( $editor_styles ) ) {
-			$mce_css = array();
-			$style_uri = get_stylesheet_directory_uri();
-			if ( TEMPLATEPATH == STYLESHEETPATH ) {
-				foreach ( $editor_styles as $file )
-					$mce_css[] = "$style_uri/$file";
-			} else {
-				$style_dir    = get_stylesheet_directory();
-				$template_uri = get_template_directory_uri();
-				$template_dir = get_template_directory();
-				foreach ( $editor_styles as $file ) {
-					if ( file_exists( "$style_dir/$file" ) )
-						$mce_css[] = "$style_uri/$file";
-					if ( file_exists( "$template_dir/$file" ) )
-						$mce_css[] = "$template_uri/$file";
-				}
-			}
-			$mce_css = implode( ',', $mce_css );
-		} else {
-			$mce_css = '';
-		}
-		
-		$mce_css = trim( apply_filters( 'mce_css', $mce_css ), ' ,' );
-		
-		if ( ! empty($mce_css) )
-			$initArray['content_css'] = $mce_css;
-		
-		// For people who really REALLY know what they're doing with TinyMCE
-		// You can modify initArray to add, remove, change elements of the config before tinyMCE.init
-		// Setting "valid_elements", "invalid_elements" and "extended_valid_elements" can be done through "tiny_mce_before_init".
-		// Best is to use the default cleanup by not specifying valid_elements, as TinyMCE contains full set of XHTML 1.0.
-		$initArray = apply_filters('tiny_mce_before_init', $initArray);
 		
 		if ( empty($initArray['theme_advanced_buttons3']) && !empty($initArray['theme_advanced_buttons4']) ) {
 			$initArray['theme_advanced_buttons3'] = $initArray['theme_advanced_buttons4'];
