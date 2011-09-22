@@ -40,7 +40,7 @@ class SSM_Admin_Post {
 			<script type="text/javascript">
 			/* <![CDATA[ */
 			var win = window.dialogArguments || opener || parent || top;
-			win.send_to_editor('<?php echo addslashes($_GET['shortcode']); ?>');
+			win.send_to_editor('<?php echo $_GET['shortcode']; ?>');
 			/* ]]> */
 			</script>
 			<?php
@@ -109,7 +109,7 @@ class SSM_Admin_Post {
 					$insertion = ( !empty($ssm_fields[$shortcode_key]['default']) ) ? $ssm_fields[$shortcode_key]['default'] : '['.$shortcode_key.']';
 					?>
 					<div class='media-item'>
-						<a type="submit" class="button insert_link" href="<?php echo add_query_arg( array('shortcode' => $insertion) ); ?>"><?php _e('Insert', 'ssm'); ?></a>
+						<a type="submit" class="button insert_link" href="<?php echo stripslashes(esc_js( add_query_arg( array('shortcode' => $insertion) )	) ); ?>"><?php _e('Insert', 'ssm'); ?></a>
 						
 						<a class='toggle describe-toggle-on' href='#'><?php _e('Show usage', 'ssm'); ?></a>
 						<a class='toggle describe-toggle-off' href='#'><?php _e('Hide usage', 'ssm'); ?></a>
